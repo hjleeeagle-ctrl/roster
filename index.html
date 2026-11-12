@@ -59,6 +59,8 @@ button.pri,.btn.pri{background:var(--ac);color:#04201f;border-color:var(--ac);fo
 .cd{font-size:12px;color:var(--nx);font-weight:700;margin-top:2px}
 .note{color:var(--mu);font-size:12px}
 .foot{color:var(--mu);font-size:11px;margin-top:16px}
+.apt{all:unset;cursor:pointer;border-bottom:1px dotted var(--mu)}.apt:hover{color:var(--ac)}
+@media print{.apt{border:0}}
 @media print{
  @page{size:A4;margin:8mm}
  :root,:root[data-theme]{--bg:#fff;--card:#fff;--tx:#000;--mu:#555;--ln:#bbb;--ac:#0a6f6f;--nx:#b45309;--chip:#eee;padding:0}
@@ -157,7 +159,7 @@ function render(){
  if(nxt){
   const live=nxt.s<=now;
   nb.className="nextbar";
-  nb.innerHTML=`<div class="note">${live?"현재 비행 중":"다음 비행"}</div><div class="big">${esc(nxt.no)} · ${esc(nxt.from)} → ${esc(nxt.to)}</div><div>${nxt.std.slice(5,10).replace("-","/")} (${WD[new Date(nxt.std.slice(0,10)+"T00:00:00Z").getUTCDay()]}) STD ${nxt.std.slice(11)} <span class="note">(${esc(nxt.from)} 현지)</span></div><div class="cd" id="cd"></div>`;
+  nb.innerHTML=`<div class="note">${live?"현재 비행 중":"다음 비행"}</div><div class="big">${esc(nxt.no)} · <a class="apt" href="${apLink(nxt.from)}" target="_blank" rel="noopener">${esc(nxt.from)}</a> → <a class="apt" href="${apLink(nxt.to)}" target="_blank" rel="noopener">${esc(nxt.to)}</a></div><div>${nxt.std.slice(5,10).replace("-","/")} (${WD[new Date(nxt.std.slice(0,10)+"T00:00:00Z").getUTCDay()]}) STD ${nxt.std.slice(11)} <span class="note">(${esc(nxt.from)} 현지)</span></div><div class="cd" id="cd"></div>`;
   tick(nxt,now);
  } else {nb.className="";nb.innerHTML=""}
  // group by date
@@ -206,7 +208,7 @@ function render(){
    const cur=a===nxt;
    const crew=a.crew.filter(c=>c.id!==D.id).map(c=>`<span class="chip ${c.du==="TVL"?"tvl":""}">${esc(c.du==="TVL"?"TVL":c.pic||c.rk)} ${esc(c.rk)} ${esc(c.nm)}</span>`).join("");
    return `<div class="fl ${cur?"cur":""}"><div class="r1"><span class="no">${esc(a.no)}</span>${me.pic?`<span class="chip me">${esc(me.pic)}${dh?" · TVL":""}</span>`:""}${a.fl?`<span class="note">${Math.floor(dur/60)}h${pad(dur%60)}</span>`:""}<span class="ac">${esc(a.ac)}</span></div>
-   ${a.from||a.to?`<div class="route"><div><div class="st">${esc(a.from)}</div><div class="tm">${a.std.slice(11)}</div></div><div class="ar">→</div><div><div class="st">${esc(a.to)}</div><div class="tm">${a.sta?a.sta.slice(11):""}${plus?"<sup>+1</sup>":""}</div></div></div>`:`<div class="tm">${a.std.slice(11)}${a.sta?" – "+a.sta.slice(11):""}</div>`}
+   ${a.from||a.to?`<div class="route"><div><div class="st"><a class="apt" href="${apLink(a.from)}" target="_blank" rel="noopener">${esc(a.from)}</a></div><div class="tm">${a.std.slice(11)}</div></div><div class="ar">→</div><div><div class="st"><a class="apt" href="${apLink(a.to)}" target="_blank" rel="noopener">${esc(a.to)}</a></div><div class="tm">${a.sta?a.sta.slice(11):""}${plus?"<sup>+1</sup>":""}</div></div></div>`:`<div class="tm">${a.std.slice(11)}${a.sta?" – "+a.sta.slice(11):""}</div>`}
    ${cur?`<div class="cd" data-cd="1"></div>`:""}
    ${showCrew&&crew?`<div class="crew">${crew}</div>`:""}</div>`}).join("");
   h+=`${tot?`<span class="dtot">Block ${Math.floor(tot/60)}h${pad(tot%60)}</span>`:""}</div>${fh}</div>`;
@@ -244,6 +246,8 @@ $("bReset").onclick=()=>{try{localStorage.removeItem("rosterCards")}catch(e){}sa
 let th="dark";try{th=localStorage.getItem("rosterTheme")||"dark"}catch(e){}
 document.documentElement.dataset.theme=th;
 $("bTheme").onclick=()=>{th=th==="dark"?"light":"dark";document.documentElement.dataset.theme=th;try{localStorage.setItem("rosterTheme",th)}catch(e){}};
+const ICAO={ICN:"RKSI",GMP:"RKSS",PUS:"RKPK",CJU:"RKPC",TAE:"RKTN",KWJ:"RKJJ",CJJ:"RKTU",MWX:"RKJB",USN:"RKPU",RSU:"RKJY",HIN:"RKPS",KUV:"RKJK",YNY:"RKNY",WJU:"RKNW",NRT:"RJAA",HND:"RJTT",KIX:"RJBB",ITM:"RJOO",NGO:"RJGG",FUK:"RJFF",CTS:"RJCC",OKA:"ROAH",KMJ:"RJFT",HIJ:"RJOA",SDJ:"RJSS",KMQ:"RJNK",OKJ:"RJOB",KMI:"RJFM",NGS:"RJFU",KOJ:"RJFK",MYJ:"RJOM",TAK:"RJOT",AOJ:"RJSA",TOY:"RJNT",UKB:"RJBE",TPE:"RCTP",KHH:"RCKH",RMQ:"RCMQ",TSA:"RCSS",PEK:"ZBAA",PKX:"ZBAD",PVG:"ZSPD",SHA:"ZSSS",HKG:"VHHH",MFM:"VMMC",MNL:"RPLL",CEB:"RPVM",SIN:"WSSS",KUL:"WMKK",BKK:"VTBS",HAN:"VVNB",SGN:"VVTS",DAD:"VVDN",CXR:"VVCR",PQC:"VVPQ",CGK:"WIII",DPS:"WADD",ULN:"ZMCK",XIY:"ZLXY",XMN:"ZSAM",TAO:"ZSQD",DLC:"ZYTL",SHE:"ZYTX",HGH:"ZSHC",NKG:"ZSNJ",TSN:"ZBTJ",SZX:"ZGSZ",CAN:"ZGGG",CTU:"ZUUU",CKG:"ZUCK",WUH:"ZHHH",KMG:"ZPPP",HAK:"ZJHK",SYX:"ZJSY",GUM:"PGUM",SPN:"PGSN",HNL:"PHNL"};
+function apLink(c){const ic=ICAO[c]||(/^[A-Z]{4}$/.test(c)?c:"");return ic?`https://aviationweather.gov/data/metar/?ids=${ic}&taf=1`:"https://aviationweather.gov/data/metar/"}
 let init=SAMPLE;try{const s=localStorage.getItem("rosterCards");if(s){init=JSON.parse(s);saved=true}}catch(e){}
 load(init);
 </script>
